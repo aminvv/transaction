@@ -8,8 +8,9 @@ namespace NodeJS{
 
 
         //Token
-        OTP_TOKEN_SECRET:string
-        COOKIE_SECRET:string
+        OTP_TOKEN_SECRET:string,
+        COOKIE_SECRET:string,
+        ACCESS_TOKEN_SECRET:string,
 
     }
 } 

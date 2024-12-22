@@ -117,12 +117,12 @@ export class AuthService {
         const now = new Date()
         if (otp.ExpiresIn < now) throw new UnauthorizedException(AuthMessage.ExpiredCode)
         if (otp.code !== code) throw new UnauthorizedException(AuthMessage.TryAgain)
+            const accessToken=await this.tokenService.createAccessToken({userId})
         return {
-            message:publicMessage.loggedIn
+            message:publicMessage.loggedIn,
+            accessToken
 }
     }
-
-
 
     sendResponse(res: Response, result: AuthResponseType) {
         const { code, tokenOtp } = result
@@ -134,6 +134,14 @@ export class AuthService {
             message: publicMessage.SendOtp
 
         })
+    }
+
+
+    async validationAccessToken(accessToken:string){
+        const{userId}= await this.tokenService.verifyAccessToken(accessToken)
+        const user=await this.userRepository.findOneBy(userId)
+        if(!user)throw new UnauthorizedException(AuthMessage.loginAgain)
+            return user
     }
 
 

@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { CookiePayload } from "../user/dto/payload";
+import { AccessTokenPayload, CookiePayload } from "../user/dto/payload";
 import { AuthMessage } from "@/common/enums/message.enum";
 
 @Injectable()
@@ -32,5 +32,27 @@ export class TokenService {
         throw new UnauthorizedException(AuthMessage.TryAgain)
     }
 }
+
+
+// ---------------ACCESS TOkEN-------------
+
+createAccessToken(payload:AccessTokenPayload){
+const tokenAccess= this.jwtService.sign(payload,{
+    secret:process.env.ACCESS_TOKEN_SECRET,
+    expiresIn:"1y"
+})
+return tokenAccess 
+}
+
+verifyAccessToken(tokenAccess:string){
+try {
+    return this.jwtService.verify(tokenAccess,{
+        secret:process.env.ACCESS_TOKEN_SECRET
+    })
+} catch (error) {
+    throw new UnauthorizedException(AuthMessage.loginAgain)
+}
+}
+
 
 } 
