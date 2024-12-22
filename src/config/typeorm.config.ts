@@ -1,3 +1,6 @@
+import { OtpEntity } from "@/module/user/entities/otp.entity";
+import { UserEntity } from "@/module/user/entities/user.entity";
+import { WalletEntity } from "@/module/wallet/entities/wallet.entity";
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { join } from "path";
 
@@ -12,9 +15,10 @@ export function TypeOrmConfig():TypeOrmModuleOptions{
         username:DB_USERNAME,
         password:DB_PASSWORD,
         autoLoadEntities:false,
-        entities:[join(__dirname,"../module/**/entities/*.entity{.ts,.js}")],
+        // entities:[join(__dirname,"../module/**/entities/*.entity{.ts,.js}")],
+        entities:[OtpEntity,UserEntity,WalletEntity],
         synchronize:true
 
     }
 }
-     
+      

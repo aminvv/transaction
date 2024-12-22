@@ -1,6 +1,6 @@
 import { BaseEntityCustom } from "@/common/abstract/baseEntityCustom.entity";
 import { EntityName } from "@/common/enums/entity.enum";
-import { Column, CreateDateColumn, Entity, ManyToMany } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne } from "typeorm";
 import { WalletType } from "../enum/walletType.enum";
 import { UserEntity } from "@/module/user/entities/user.entity";
 
@@ -14,6 +14,6 @@ export class WalletEntity extends BaseEntityCustom{
     create_at:Date
     @Column()
     userId:number
-    @ManyToMany(()=>UserEntity,user=>user.transaction,{onDelete:"SET NULL"})
-    user:UserEntity
+    @ManyToOne(()=>UserEntity,user=>user.transaction,{onDelete:"SET NULL"})
+    users:UserEntity
 }
