@@ -14,15 +14,17 @@ export class UserEntity extends BaseEntityCustom {
     fullname: string
     @Column()
     mobile: string
-    @Column({ type: "numeric", default: 0 })
+    @Column({ type: "numeric", default:0})
     balance: number
     @CreateDateColumn()
     create_at: Date
     @Column({ nullable: true })
     otpId:number
+    @Column({ nullable: true })
+    walletId:number
     @OneToMany(() => WalletEntity, wallet => wallet.users)
     transaction: WalletEntity[]
     @OneToOne(()=>OtpEntity,otp=>otp.user, { nullable: true })
     @JoinColumn({name:"otpId"})
-    otp:OtpEntity
+    otp:OtpEntity 
 } 

@@ -13,6 +13,7 @@ import { Request, Response } from 'express';
 import { AuthResponseType } from './enum/response.type';
 import { CookieKeys } from '@/common/enums/cookie.enum';
 import { AuthMessage, publicMessage } from '@/common/enums/message.enum';
+import { WalletEntity } from '../wallet/entities/wallet.entity';
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthService {
@@ -20,6 +21,7 @@ export class AuthService {
     constructor(
         @Inject(REQUEST) private request: Request,
         @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
+        @InjectRepository(WalletEntity) private walletRepository: Repository<WalletEntity>,
         @InjectRepository(OtpEntity) private otpRepository: Repository<OtpEntity>,
         private tokenService: TokenService
     ) { }
@@ -52,16 +54,25 @@ export class AuthService {
                 username,
                 mobile,
                 password: hashPassword,
-
-
             })
             user = await this.userRepository.save(user)
             const otp = await this.createOtpAndSave(user.id)
             const tokenOtp = this.tokenService.createOtpToken({ userId: user.id })
+
+            let wallet =  this.walletRepository.create({
+                balance:0,
+                userId:user.id
+            })
+            wallet= await this.walletRepository.save(wallet)
+            await this.userRepository.update({ id: user.id }, { walletId: wallet.id });
+
             return {
+                wallet ,
                 tokenOtp,
                 code: otp.code,
             }
+
+
         }
     }
 
@@ -73,6 +84,7 @@ export class AuthService {
         if (!isPasswordMatching) throw new UnauthorizedException()
         const otp = await this.createOtpAndSave(user.id)
         const tokenOtp = this.tokenService.createOtpToken({ userId: user.id })
+        
         return {
             tokenOtp,
             code: otp.code
@@ -111,23 +123,25 @@ export class AuthService {
     async checkOtp(code: string) {
         const token = this.request.cookies?.[CookieKeys.OTP];
         if (!token) throw new UnauthorizedException(AuthMessage.loginAgain);
+        
         const { userId } = this.tokenService.verifyOtpToken(token)
         const otp = await this.otpRepository.findOneBy({ userId })
+
         if (!otp) throw new UnauthorizedException(AuthMessage.TryAgain)
         const now = new Date()
         if (otp.ExpiresIn < now) throw new UnauthorizedException(AuthMessage.ExpiredCode)
         if (otp.code !== code) throw new UnauthorizedException(AuthMessage.TryAgain)
-            const accessToken=await this.tokenService.createAccessToken({userId})
+        const accessToken = await this.tokenService.createAccessToken({ userId })
         return {
-            message:publicMessage.loggedIn,
+            message: publicMessage.loggedIn,
             accessToken
-}
+        }
     }
-
-    sendResponse(res: Response, result: AuthResponseType) {
-        const { code, tokenOtp } = result
-        res.cookie(CookieKeys.OTP, tokenOtp, { httpOnly: true, expires: new Date(Date.now() + (1000 * 60 * 2)) });
-
+ 
+    async sendResponse(res: Response, result: AuthResponseType) {
+        const { tokenOtp, code } = result
+        res.cookie(CookieKeys.OTP, tokenOtp, {    httpOnly:true,
+            expires:new Date( Date.now() +(1000*60*2))})
         res.json({
             tokenOtp,
             code,
@@ -137,13 +151,13 @@ export class AuthService {
     }
 
 
-    async validationAccessToken(accessToken:string){
-        const{userId}= await this.tokenService.verifyAccessToken(accessToken)
-        const user=await this.userRepository.findOneBy(userId)
-        if(!user)throw new UnauthorizedException(AuthMessage.loginAgain)
-            return user
+    async validationAccessToken(accessToken: string) {
+        const { userId } = this.tokenService.verifyAccessToken(accessToken)
+        const user = await this.userRepository.findOneBy({id:userId})
+        if (!user) throw new UnauthorizedException(AuthMessage.loginAgain)
+        return user
     }
 
 
-
+ 
 }

@@ -6,10 +6,13 @@ import { UserEntity } from '../user/entities/user.entity';
 import { OtpEntity } from '../user/entities/otp.entity';
 import { JwtService } from '@nestjs/jwt';
 import { TokenService } from './token.service';
+import { WalletEntity } from '../wallet/entities/wallet.entity';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([UserEntity,OtpEntity])],
+  imports:[TypeOrmModule.forFeature([UserEntity,OtpEntity,WalletEntity]),],
   controllers: [AuthController],
   providers: [AuthService,JwtService,TokenService],
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { AccessTokenPayload, CookiePayload } from "../user/dto/payload";
+import { AccessTokenPayload, CookiePayload } from "./dto/payload";
 import { AuthMessage } from "@/common/enums/message.enum";
 
 @Injectable()
@@ -44,7 +44,7 @@ const tokenAccess= this.jwtService.sign(payload,{
 return tokenAccess 
 }
 
-verifyAccessToken(tokenAccess:string){
+verifyAccessToken(tokenAccess:string):AccessTokenPayload{
 try {
     return this.jwtService.verify(tokenAccess,{
         secret:process.env.ACCESS_TOKEN_SECRET
