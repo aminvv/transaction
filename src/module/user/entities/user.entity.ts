@@ -22,9 +22,9 @@ export class UserEntity extends BaseEntityCustom {
     otpId:number
     @Column({ nullable: true })
     walletId:number
-    @OneToMany(() => WalletEntity, wallet => wallet.users)
+    @OneToMany(() => WalletEntity, wallet => wallet.user)
     transaction: WalletEntity[]
     @OneToOne(()=>OtpEntity,otp=>otp.user, { nullable: true })
     @JoinColumn({name:"otpId"})
     otp:OtpEntity 
-} 
+}  

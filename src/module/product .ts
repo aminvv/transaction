@@ -1,0 +1,32 @@
+export const ProductList =[
+    {
+        id:1,
+        name:"iPhone",
+        price:1500
+    },
+    {
+        id:2,
+        name:"monitor",
+        price:100
+    },
+    {
+        id:3,
+        name:"USB",
+        price:50
+    },
+    {
+        id:4,
+        name:"spiker",
+        price:15
+    },
+    {
+        id:5,
+        name:"case",
+        price:4500
+    },
+    {
+        id:6,
+        name:"watch",
+        price:1000
+    },
+]
